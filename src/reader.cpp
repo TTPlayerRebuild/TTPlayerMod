@@ -1,3 +1,4 @@
+#include "ttpcomm/audio_format_probe_impl.h"
 #include "io.h"
 #pragma warning(push)
 #pragma warning(disable:4005 4100)
@@ -49,7 +50,7 @@ std::wstring ansi_title(const char *title) {
     return result;
 }
 }
-class ModuleReader final : public Reader, public Metadata {
+class ModuleReader final : public Reader, public Metadata, public ttp::format::InfoSupport {
     LONG refs_{1};
     std::unique_ptr<Input> input_;
     std::unique_ptr<CSoundFile> module_;
@@ -79,6 +80,9 @@ public:
         if (module_) { EngineGuard guard; module_.reset(); }
     }
     HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, void **p) override {
+        if (!p) return E_POINTER;
+        if (IsEqualIID(iid, ttp::format::iid_info)) { *p=static_cast<ttp::format::SourceInfo*>(this); AddRef(); return S_OK; }
+
         if (!p) return E_POINTER; *p = nullptr;
         if (same(iid, IID_IUnknown) || same(iid, iid_reader)) *p = static_cast<Reader*>(this);
         else if (same(iid, iid_metadata)) *p = static_cast<Metadata*>(this);
@@ -87,7 +91,12 @@ public:
     }
     ULONG STDMETHODCALLTYPE AddRef() override { return InterlockedIncrement(&refs_); }
     ULONG STDMETHODCALLTYPE Release() override { auto n = InterlockedDecrement(&refs_); if (!n) delete this; return n; }
-    HRESULT STDMETHODCALLTYPE Open(IStream *s, DWORD) override {
+    HRESULT STDMETHODCALLTYPE Open(IStream* probe_stream, DWORD probe_flags) override {
+        const auto probed = PrepareFormatInfo(probe_stream, ttp::format::Module);
+        if (FAILED(probed)) return probed;
+        return CompleteFormatInfo(OpenImpl(probe_stream, probe_flags));
+    }
+    HRESULT OpenImpl(IStream *s, DWORD) {
         if (module_) return E_UNEXPECTED;
         auto hr = protect([&] {
             input_ = std::make_unique<Input>(); input_->open(s);

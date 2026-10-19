@@ -25,3 +25,7 @@ SHA-256：`457ca5a6c179656d66c01505c0d95fafaead4329b9dbaa0f997d00a3508ad9de`。�
 固定 libopenmpt **0.8.9**，来源及 SHA-256 见 `cmake/modern_codec.cmake`。此模式采用现代 Tracker 的效果解释、混音、定位和曲尾规则，可能改变历史曲目的音序与时长；它不是默认兼容模式，也不会自动作为读取回退。使用固定种子的原 ModPlug 0.5-bit 抖动。
 
 输入直接读取宿主 IStream，支持 Unicode、压缩包虚拟流、短读和不可定位输入；载入后内存定位，一次输入上限 256 MiB。证据、并发隔离和边界见 `docs/RECONSTRUCTION.md`。
+
+## 可选格式识别接口
+
+2026-10-20：Reader 工厂增加 Probe，Reader 增加 SourceInfo；旧导出和接口槽位保持不变。声明与辅助实现位于 `include/ttpcomm/audio_format_probe.h` 和 `audio_format_probe_impl.h`，不增加运行时 DLL 依赖。协议原件在相邻 `ttpcomm/sdk/AUDIO_FORMAT_PROBE.md`；新建插件指南在相邻 `rebuild/docs/AUDIO_PLUGIN_DEVELOPMENT_GUIDE.md`。原版播放器继续使用旧接口；错误后缀候选选择和更名提示由支持新协议的重建播放器执行。
