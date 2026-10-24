@@ -10,6 +10,7 @@
 #pragma pop_macro("lstrcpyn")
 #pragma warning(pop)
 #include <array>
+#include "legacy_mixer.h"
 
 // The original-family engine has global scratch buffers and mixer settings.
 // All engine calls are serialized; per-reader DC/ramp history is restored
@@ -25,6 +26,7 @@ void initialize_engine() {
             InterlockedExchange(&engine_initialized, -1);
             throw Failure{E_OUTOFMEMORY};
         }
+        ttp_mod_legacy::InitializeTables();
         CSoundFile::SetWaveConfig(44100, 16, 2, FALSE);
         CSoundFile::SetResamplingMode(3);
         CSoundFile::SetMixConfig(128, 32);
@@ -60,13 +62,16 @@ class ModuleReader final : public Reader, public Metadata, public ttp::format::I
     std::array<BYTE, 4096> pending_{};
     DWORD pending_size_{}, pending_offset_{};
     LONG dry_right_{}, dry_left_{}, reverb_right_{}, reverb_left_{};
+    std::uint32_t dither_a_{}, dither_b_{};
     void restore_mixer() {
         gnDryROfsVol = dry_right_; gnDryLOfsVol = dry_left_;
         gnRvbROfsVol = reverb_right_; gnRvbLOfsVol = reverb_left_;
+        ttp_mod_legacy::dither_a = dither_a_; ttp_mod_legacy::dither_b = dither_b_;
     }
     void save_mixer() {
         dry_right_ = gnDryROfsVol; dry_left_ = gnDryLOfsVol;
         reverb_right_ = gnRvbROfsVol; reverb_left_ = gnRvbLOfsVol;
+        dither_a_ = ttp_mod_legacy::dither_a; dither_b_ = ttp_mod_legacy::dither_b;
     }
     template<class T> HRESULT property(T *p, T value) {
         if (!p) return E_POINTER;

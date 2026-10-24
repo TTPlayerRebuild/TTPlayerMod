@@ -2,6 +2,8 @@
 
 日期：2026-10-19。
 
+后续：[真实 UMX 与两组 XM 效果对照（2026-10-24）](UMX_EFFECT_FOLLOWUP_20261024.md)。新增样本的音序时长和 EOF 长度一致，但 PCM 仍有差异，未将其标记为完全恢复。
+
 原 DLL SHA-256：`e295817c9532d1a159a470b2caa6cb2dfc0bef7930f56d0d9ffacb05b1b8c036`。
 
 ## 原版证据
@@ -66,3 +68,7 @@ TTP_MOD_MODERN_ENGINE=ON 显式选用 libopenmpt 0.8.9，不作为默认或自�
 2026-10-19：采用默认兼容核的最终 MOD DLL 在原版 5.7.9 与重建播放器中分别完成 Windows 11、XP SP3、Win7 SP1 的加载、开始播放与关闭测试。六次均加载预期插件路径，主窗口存在、没有错误对话框、没有强制关闭，PlayingTime 大于零。私有记录：`rebuild/tests/audio_plugins_fix_20261019/hosts/{win11,xp,win7}-final-legacy.log`。
 
 这确认真实宿主 ABI 与播放入口，不扩大为所有模块效果命令均相同。Windows 11 不能替代独立 Windows 10 实测。
+
+## 2026-10-25 混音差异修复
+
+已恢复原版主音量/预放大、三组滤波表、立体声插值、抖动和 16 位取整；原 DLL 99,328 个系数与 2,048 个抖动输出精确对照通过。11 个样本及每系统 14 组 XP / Win7 回归通过。详见 [MIXER_PARITY_20261025.md](MIXER_PARITY_20261025.md)，其中明确保留真实 UMX 的局部 PCM 差异，未宣称全效果逐位一致。
