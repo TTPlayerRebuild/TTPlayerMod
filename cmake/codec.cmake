@@ -58,8 +58,8 @@ string(REPLACE "${end_padding_right}" "pSample[len*2+7] = pSample[len*2+5] = pSa
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/codec-generated/sndfile.cpp" "${loader}")
 include("${CMAKE_CURRENT_LIST_DIR}/mixer_compat.cmake")
 file(GLOB core_sources CONFIGURE_DEPENDS "${src}/*.cpp")
-list(REMOVE_ITEM core_sources "${src}/snd_fx.cpp" "${src}/sndfile.cpp" "${src}/modplug.cpp" "${src}/fastmix.cpp" "${src}/sndmix.cpp")
-add_library(codec STATIC ${core_sources} "${CMAKE_CURRENT_SOURCE_DIR}/src/legacy_mixer.cpp"
+list(REMOVE_ITEM core_sources "${src}/snd_fx.cpp" "${src}/sndfile.cpp" "${src}/modplug.cpp" "${src}/fastmix.cpp" "${src}/sndmix.cpp" "${src}/load_umx.cpp")
+add_library(codec STATIC ${core_sources} "${CMAKE_CURRENT_SOURCE_DIR}/src/legacy_mixer.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/umx_reader.cpp"
  "${CMAKE_CURRENT_BINARY_DIR}/codec-generated/snd_fx.cpp" "${CMAKE_CURRENT_BINARY_DIR}/codec-generated/sndfile.cpp"
  "${CMAKE_CURRENT_BINARY_DIR}/codec-generated/fastmix.cpp" "${CMAKE_CURRENT_BINARY_DIR}/codec-generated/sndmix.cpp")
 target_include_directories(codec PUBLIC "${src}" "${src}/libmodplug" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
